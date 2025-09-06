@@ -39,14 +39,14 @@ function setup() {
   for (let x = 0 + size; x <= world_width - size; x += space) {
     for (let y = 0 + 4; y <= world_height - 4; y += space) {
       // //i also want to push the colours of my image here. so:
-      // let col = convert_coordinates_to_colour(x, y, photograph);
+      let col = convert_coordinates_to_colour(x, y, photograph);
 
       // //check and swap white for black. 
-      // if (col[0]==255 && col[1]==255 && col[2]==255){
-      //   col = [0, 0, 0]; 
-      // }
+      if (col[0]==255 && col[1]==255 && col[2]==255){
+        col = [0, 0, 0]; 
+      }
 
-      people.push(new People(x, y));
+      people.push(new People(x, y, col));
     }
   }
 }
@@ -73,7 +73,7 @@ function convert_coordinates_to_colour(x, y, img) {
 }
 
 function draw() {
-  background(cols[0]);
+  // background(cols[0]);
 
   //each person:
   for (person of people) {
