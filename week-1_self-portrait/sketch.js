@@ -29,21 +29,21 @@ function setup() {
   //the world is born:
   createCanvas(world_width, world_height);
 
-  //don't need stroke. 
-  noStroke(); 
+  //don't need stroke.
+  noStroke();
   //get colours from the photograph once:
   get_colours_from_img(photograph);
 
   //people are born in the world:
-  const space = size +1; // people give each other some space.
+  const space = size + 1; // people give each other some space.
   for (let x = 0 + size; x <= world_width - size; x += space) {
     for (let y = 0 + 4; y <= world_height - 4; y += space) {
       // //i also want to push the colours of my image here. so:
       let col = convert_coordinates_to_colour(x, y, photograph);
 
-      // //check and swap white for black. 
-      if (col[0]==255 && col[1]==255 && col[2]==255){
-        col = [0, 0, 0]; 
+      // //check and swap white for black.
+      if (col[0] == 255 && col[1] == 255 && col[2] == 255) {
+        col = [0, 0, 0];
       }
 
       people.push(new People(x, y, col));
@@ -57,7 +57,7 @@ function get_colours_from_img(img) {
   image(img, 0, 0); //draw from the top-left.
 
   img.loadPixels();
-  background (cols[0]); 
+  background(cols[0]);
 }
 
 //helper function to convert coordinates to colours, as passed down in setup.
@@ -76,7 +76,7 @@ function draw() {
   // background(cols[0]);
 
   //each person:
-  for (person of people) {
+  for (var person of people) {
     //exists:
     person.exist();
     //moves:
@@ -100,7 +100,8 @@ class People {
 
     //people have temporary destinations:
     // but when they're born, those destinations don't exist.
-    (this.destination_x = x), (this.destination_y = y);
+    this.destination_x = x;
+    this.destination_y = y;
   }
 
   exist() {
