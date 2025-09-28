@@ -1,23 +1,9 @@
-function declareVariables(){
-let x = 0; 
-let y = 50; 
+//name; date.
 
-return [x, y]; 
+function setup() {
+  createCanvas(800, 800);
 }
 
-function pass(){
-// console.log(declareVariables()[0]); 
-let x = 0; 
-
-x++; 
-}
-
-function setup(){
-    createCanvas (200,200); 
-// console.log("hey"); 
-}
-
-function draw(){
-pass();
-noLoop(); 
+function draw() {
+  background(0);
 }
