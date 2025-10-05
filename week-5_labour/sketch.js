@@ -13,7 +13,7 @@ ask: Functions are the basic unit of labor in your code. ~~Take a sketch you’v
 //for font: 
 let font; 
 function preload(){
-font = loadFont("/week-5_labour/PTMono-Regular.ttf"); 
+font = loadFont("./PTMono-Regular.ttf"); 
 }
 
 function setup() {
