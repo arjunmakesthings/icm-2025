@@ -1,8 +1,20 @@
-//labour; 251003.
+//the computer revolts; 251003-04.
+
+// made for week 5; labour.
+
+/*
+ask: Functions are the basic unit of labor in your code. ~~Take a sketch you’ve already done and re-organize the code into functional units of labor that you define~~. You can also conceive of an entirely new world of labor. What kinds of labor does it take to make your sketch run?
+*/
 
 // thought: want to make a function that does not listen to its instructions.
 
 //realised that i can call functions inside the browser. that makes it very interesting. a sketch can play, and a person can call a function that misbehaves. that's unexpected, atleast for a class learning how to code.
+
+//for font: 
+let font; 
+function preload(){
+font = loadFont("/week-5_labour/PTMono-Regular.ttf"); 
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -10,7 +22,8 @@ function setup() {
   background(0);
 
   textSize(16);
-  fill(255);
+  fill(100);
+  textFont(font); 
   text("open the console on your browser (cmd+shift+c or control + shift + c) to interact with this sketch.", 50, 50);
 
   noFill();
@@ -20,10 +33,10 @@ function setup() {
 }
 
 function draw() {
-//there is no draw.
+  //there is no draw.
 }
 
-let sw = 3; //variable for stroke_weight.
+let sw = 5; //variable for stroke_weight.
 
 function draw_point(x, y, block_control = false) {
   //do what you're told.
@@ -35,6 +48,8 @@ function draw_point(x, y, block_control = false) {
   if (block_control == false) {
     control(x, y);
   }
+
+  return "oops"; //return this in the console instead of undefined.
 }
 
 let min_run = 5;
@@ -49,6 +64,12 @@ function control(x, y) {
     let new_y = (y += random(-sw, sw));
     setTimeout(() => {
       draw_point(new_x, new_y, true);
-    }, i * 10);
+    }, i * 10); //make new point, but incrementally.
   }
 }
+
+// function windowResized() {
+//   clear();
+//   resizeCanvas(windowWidth, windowHeight);
+//   setup();
+// }
