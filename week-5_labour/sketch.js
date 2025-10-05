@@ -24,7 +24,7 @@ function setup() {
   textSize(16);
   fill(100);
   textFont(font); 
-  text("open the console on your browser (cmd+shift+c or control + shift + c) to interact with this sketch.", 50, 50);
+  text("open the console on your browser (cmd+shift+c or control+shift+c) to interact with this sketch.", 50, 50);
 
   noFill();
 
