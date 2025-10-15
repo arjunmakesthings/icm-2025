@@ -11,14 +11,16 @@ function draw() {
 
 let sw = 5; //variable for stroke_weight.
 
-function draw_point(x, y) {
+function draw_point(x, y, block_control = false) {
   //do what you're told.
   strokeWeight(sw);
   stroke(255);
   point(x, y);
 
   //then, give over control to the computer.
+  if (block_control == false) {
     control(x, y);
+  }
 
   return "oops"; //return this in the console instead of undefined.
 }
@@ -30,9 +32,8 @@ function control(x, y) {
   let times_to_run = int(random(1, 1000));
 
   for (let i = 0; i < times_to_run; i++) {
-    //syntax: setTimeout(function, delay, arg1, arg2, ...); (from: https://www.geeksforgeeks.org/javascript/how-to-delay-a-function-call-in-javascript/)
     let new_x = (x += random(-sw, sw));
     let new_y = (y += random(-sw, sw));
-      draw_point(new_x, new_y);
+      draw_point(new_x, new_y, true);
   }
 }
