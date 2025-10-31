@@ -12,7 +12,7 @@ function setup() {
 
 function draw() {
     img.loadPixels();
-    for (let i = 0; i < img.pixels.length; i += 4) {
+    for (let i = 0; i < img.pixels.length; i +=4) {
       img.pixels[i + 1]++;
     }
     img.updatePixels();
