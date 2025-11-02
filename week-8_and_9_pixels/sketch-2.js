@@ -41,26 +41,37 @@ function draw() {
   loadPixels();
 
   //draw a black background:
-  background(0);
+
+  // background(0);
+
+  let gap = 5;
 
   //fuck-up the values:
-  for (let x = 0; x < width; x += 10) {
+  for (let x = 0; x < width; x += gap) {
     for (let y = 0; y < height; y++) {
       //every 10th pixel horizontally:
       let i = get_pixel_index(x, y);
 
       //shift those values here & there.
-      let n = noise(1);
+      let n = floor(map(noise(frameCount*0.01), 0, 1));
+
+
+        let jump = floor(map(noise(frameCount * 10), 0, width));
+
+        let p = get_pixel_index(jump, y); 
 
       if (n < 0.5) {
-        pixels[i + 10] = pixels[i]; 
-        pixels[i + 11];
-        pixels[i + 12];
-        pixels[i + 13];
+        pixels[p] = pixels[i];
+        pixels[p+1] = pixels[i-1];
+        pixels[p + 2] = pixels[i+2]
+        pixels[p + 3] = pixels[i + 3]; 
       } else {
-      }
 
-      pixels[i + 3] = 0;
+        pixels[p] = pixels[i];
+        pixels[p - 1] = pixels[i - 1];
+        pixels[p - 2] = pixels[i - 2];
+        pixels[p - 3] = pixels[i - 3]; 
+      }
     }
   }
 
