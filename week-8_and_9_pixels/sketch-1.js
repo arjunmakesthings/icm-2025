@@ -5,7 +5,7 @@ let cam;
 let rs = [];
 let gs = [];
 let bs = [];
-let as = [];
+let aps = [];
 
 let pixelation = 10;
 
@@ -44,11 +44,11 @@ function draw() {
     for (let y = 0; y < height; y += pixelation) {
       let i = get_pixel_index(x, y);
 
-      //push rgb values: 
+      //push rgb values:
       rs.push(pixels[i]);
       gs.push(pixels[i + 1]);
       bs.push(pixels[i + 2]);
-      bs.push(pixels[i + 3]);
+      aps.push(pixels[i + 3]);
     }
   }
   pop();
@@ -57,15 +57,32 @@ function draw() {
   background(0);
 
   let index = 0;
-  for (let x = 0; x < width; x += 10) {
-    for (let y = 0; y < height; y += 10) {
+  for (let x = 0; x < width; x += pixelation) {
+    for (let y = 0; y < height; y += pixelation) {
+      //pick a random rgba value to display.
+      let n = noise(1);
+      let t = 0;
+      if (n < 0.2) {
+        t = rs[index];
+      } else if (n > 0.2 && n < 0.4) {
+        t = gs[index];
+      } else if (n > 0.4 && n < 0.6) {
+        t = bs[index];
+      } else {
+        t = aps[index];
+      }
       fill(255);
-      textSize(8);
-      text(values[index], x, y);
+      let ts = pixelation - 5;
+      textSize(ts);
+      text(t, x, y);
       index++;
     }
   }
-  values = [];
+  //reset the arrays storing values.
+  rs = [];
+  gs = [];
+  bs = [];
+  aps = [];
 }
 
 function get_pixel_index(x, y) {
