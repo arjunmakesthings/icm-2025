@@ -1,13 +1,8 @@
-//pixels ; october 31st, 2025.
-
 let cam;
 
-let rs = [];
-let gs = [];
-let bs = [];
-let aps = [];
+let gap = 4;
 
-let pixelation = 10;
+let cols = []; 
 
 function setup() {
   cam = createCapture(VIDEO, canv_to_asp);
@@ -22,65 +17,39 @@ function canv_to_asp() {
 
   let wh = windowWidth * asp_ratio;
 
-  createCanvas(windowWidth, wh);
+  createCanvas(windowWidth, wh, WEBGL);
 }
 
 function draw() {
-  background(0);
-
-  push();
-
-  //flip the video:
-  scale(-1, 1);
-  translate(-width, 0);
-
-  //draw the video:
-  image(cam, 0, 0, width, height);
-
-  //get the values:
-  loadPixels();
-
-  //draw a black background:
-
   // background(0);
 
-  let gap = 5;
+  cam.loadPixels();
 
-  //fuck-up the values:
-  for (let x = 0; x < width; x += gap) {
-    for (let y = 0; y < height; y++) {
-      //every 10th pixel horizontally:
+  // push();
+  // translate(-cam.width / 2, -cam.height / 2, 0);
+  // image (cam, 0,0); //for debug; video layer.
+  // pop();
+
+  for (let x = 0; x <= cam.width; x += gap) {
+    for (let y = 0; y <= cam.height; y += gap) {
       let i = get_pixel_index(x, y);
-
-      //shift those values here & there.
-      let n = floor(map(noise(frameCount*0.01), 0, 1));
-
-
-        let jump = floor(map(noise(frameCount * 10), 0, width));
-
-        let p = get_pixel_index(jump, y); 
-
-      if (n < 0.5) {
-        pixels[p] = pixels[i];
-        pixels[p+1] = pixels[i-1];
-        pixels[p + 2] = pixels[i+2]
-        pixels[p + 3] = pixels[i + 3]; 
-      } else {
-
-        pixels[p] = pixels[i];
-        pixels[p - 1] = pixels[i - 1];
-        pixels[p - 2] = pixels[i - 2];
-        pixels[p - 3] = pixels[i - 3]; 
-      }
+      let c = color(cam.pixels[i], cam.pixels[i + 1], cam.pixels[i + 2], cam.pixels[i + 3]);
+      
+      noStroke();
+      fill(c); //colour it with what the thing actually is. 
+      
+      let z = map(hue(c), 0, 360, 0, width);
+      push();
+      translate(-cam.width / 2, -cam.height / 2, z);
+      rect(x, y, gap, gap );
+      pop();
     }
   }
 
-  //show the values:
-  updatePixels();
-
-  pop();
+  cols = []; //clear cols array.
 }
 
+//helper to get index of pixel array from x, y coordinate.
 function get_pixel_index(x, y) {
-  return (y * width + x) * 4;
+  return (y * cam.width + x) * 4;
 }

@@ -73,7 +73,7 @@ function draw() {
       }
       fill(255);
       let ts = pixelation - 5;
-      textSize(ts);
+      textSize(ts/2);
       text(t, x, y);
       index++;
     }
