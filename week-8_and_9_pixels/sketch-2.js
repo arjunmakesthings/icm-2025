@@ -35,13 +35,15 @@ function draw() {
       let i = get_pixel_index(x, y);
       let c = color(cam.pixels[i], cam.pixels[i + 1], cam.pixels[i + 2], cam.pixels[i + 3]);
       
-      noStroke();
-      fill(c); //colour it with what the thing actually is. 
+      // noStroke();
+      stroke(c); //colour it with what the thing actually is. 
       
       let z = map(hue(c), 0, 360, 0, width);
       push();
       translate(-cam.width / 2, -cam.height / 2, z);
-      rect(x, y, gap, gap );
+      strokeWeight (gap); 
+      point (x,y); 
+      // rect(x, y, gap, gap );
       pop();
     }
   }
