@@ -50,7 +50,7 @@ function draw() {
       let b = brightness(c); 
 
       //keep shifting hue:
-      let new_h = constrain(map(h - movement, 0, 360, 0, 360), 0, 360);
+      let new_h = constrain(map(h + movement, 0, 360, 0, 360), 0, 360);
 
 
       //get all values:
