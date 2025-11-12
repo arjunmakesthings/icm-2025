@@ -10,11 +10,13 @@ let player_x = 0;
 let restart = false;
 
 function setup() {
-  createCanvas(1000, 1000);
+  createCanvas(400, 800);
 }
 
 function draw() {
   background(0);
+
+  ui();
 
   for (let cell of cells) {
     cell.display();
@@ -27,6 +29,13 @@ function draw() {
     rect(start_x, start_y, mouseX - start_x, r_height);
   }
   player();
+}
+
+function ui() {
+  stroke(100);
+  for (let x = 0; x <= width; x += 10) {
+    line(x, 0, x, height);
+  }
 }
 
 function player() {
@@ -46,10 +55,10 @@ function player() {
   for (let i = 0; i < cells.length; i++) {
     if (player_x >= cells[i].x && player_x <= cells[i].x + cells[i].w) {
       cells[i].c = 190;
-      cells[i].sound(); 
+      cells[i].sound();
     } else {
       cells[i].c = 255;
-      cells[i].stop(); 
+      cells[i].stop();
     }
   }
 }
@@ -97,11 +106,11 @@ class Cell {
   }
 
   sound() {
-    this.playing=true;
-    if (this.playing==true){
-    this.osc.amp(1, 0.1);
+    this.playing = true;
+    if (this.playing == true) {
+      this.osc.amp(1, 0.1);
     }
-    this.playing=false;
+    this.playing = false;
   }
 
   stop() {
