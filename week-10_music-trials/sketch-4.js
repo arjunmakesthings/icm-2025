@@ -10,7 +10,7 @@ let player_x = 0;
 let restart = false;
 
 function setup() {
-  createCanvas(300, 800);
+  createCanvas(1000, 1000);
 }
 
 function draw() {
@@ -46,8 +46,10 @@ function player() {
   for (let i = 0; i < cells.length; i++) {
     if (player_x >= cells[i].x && player_x <= cells[i].x + cells[i].w) {
       cells[i].c = 190;
+      cells[i].sound(); 
     } else {
       cells[i].c = 255;
+      cells[i].stop(); 
     }
   }
 }
@@ -64,8 +66,7 @@ function mouseReleased() {
   let end_x = mouseX;
   let w = end_x - start_x;
 
-  let freq = map(mouseY, 0, height, 40, 500);
-  freq = constrain(40, 500);
+  let freq = constrain(map(mouseY, 0, height, 500, 40), 40, 500);
 
   cells.push(new Cell(start_x, start_y, w, freq));
 }
@@ -76,13 +77,17 @@ class Cell {
     this.y = y;
     this.w = w;
     this.h = r_height;
+    this.c = 255;
 
     this.play = false;
 
     this.freq = freq;
-    this.osc = new p5.Oscillator(); //make a new oscillator object for this entity.
+    this.osc = new p5.Oscillator("sine");
+    this.osc.freq(this.freq);
+    this.osc.amp(0);
+    this.osc.start();
 
-    this.osc.freq(this.freq); 
+    this.playing = false;
   }
   display() {
     noStroke();
@@ -92,9 +97,14 @@ class Cell {
   }
 
   sound() {
-    this.osc.start(); 
-    this.osc.amp(1); 
+    this.playing=true;
+    if (this.playing==true){
+    this.osc.amp(1, 0.1);
+    }
+    this.playing=false;
   }
 
-  stop() {}
+  stop() {
+    this.osc.amp(0, 0.1);
+  }
 }
