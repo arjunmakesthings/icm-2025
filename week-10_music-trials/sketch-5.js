@@ -1,4 +1,4 @@
-//intent: take mic-input and loop it.
+//intent: take mic-input, analyse its frequency, and loop it for a certain duration of time.
 
 let record_button;
 let recording_state = false;
