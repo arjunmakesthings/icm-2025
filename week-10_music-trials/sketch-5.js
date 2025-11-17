@@ -38,7 +38,7 @@ function record_stuff() {
     recording_state = true;
     record_button.html("stop");
 
-    currentFile = new p5.SoundFile(); 
+    currentFile = new p5.SoundFile();
     recorder.record(currentFile);
   } else {
     recording_state = false;
@@ -48,7 +48,7 @@ function record_stuff() {
 
     setTimeout(() => {
       let v = new Voice(currentFile);
-      v.loop(); //we set it in permanent loop here, and not in draw (otherwise it loops over itself). 
+      v.loop(); //we set it in permanent loop here, and not in draw (otherwise it loops over itself).
       voices.push(v);
     }, 50);
   }
@@ -56,7 +56,7 @@ function record_stuff() {
 
 class Voice {
   constructor(soundfile) {
-    this.sound= soundfile; 
+    this.sound = soundfile;
 
     this.x = random(width);
     this.y = random(height);
