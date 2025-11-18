@@ -42,17 +42,43 @@ function end() {
 
   recorder.stop();
 
-  //for everything else, i need to add a set timeout as a buffer to load the audio file i recorded. 
+  //for everything else, i need to add a set timeout as a buffer to load the audio file i recorded.
   setTimeout(() => {
+    recording_file.play();
+
+    recording_file.onended(() => {
+      //after the playing has ended, perform an fft analysis.
+      fft.setInput(recording_file);
+      let frequencies = fft.analyze();
+
+      //find frequency-bin with max amplitude.
+      let maxAmp = 0;
+      let maxIndex = 0;
+      for (let i = 0; i < frequencies.length; i++) {
+        if (frequencies[i] > maxAmp) {
+          maxAmp = frequencies[i];
+          maxIndex = i;
+        }
+      }
+
+      //convert bin index to frequency.
+      let nyquist = sampleRate() / 2; // Nyquist frequency
+      let freqPerBin = nyquist / frequencies.length;
+      let dominantFreq = maxIndex * freqPerBin;
+
+      // console.log("max amplitude:", maxAmp);
+      // console.log("dominant frequency (hz):", dominantFreq);
+    });
+
     recording_file.loop();
-
-    //perform fft analysis.
-    fft.setInput(recording_file);
-    let frequencies = fft.analyze();
-
     voices.push(new Voice(recording_file));
-  }, 50); 
+  }, 50);
+}
 
+function createLooper(){
+  let looper = new p5.SoundLoop();
+
+  // let interval = fre
 
 }
 
