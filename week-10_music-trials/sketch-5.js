@@ -6,7 +6,7 @@ let can_play = false;
 
 let voices = [];
 
-let fft;
+// let fft;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -26,7 +26,7 @@ function setup() {
   recorder.setInput(mic);
 
   recording_file = new p5.SoundFile();
-  fft = new p5.FFT();
+  // fft = new p5.FFT();
 }
 
 function begin() {
@@ -46,6 +46,8 @@ function end() {
   setTimeout(() => {
     //fft needs you to play the recording first. so do that:
     recording_file.play();
+
+    let fft = new p5.FFT();
 
     //once it ends, analyse the frequency:
     recording_file.onended(() => {
@@ -73,7 +75,7 @@ function end() {
       //set it to play on loop:
       recording_file.loop();
     });
-  }, 100);
+  }, 100); // small buffer to ensure recording buffer is ready
 }
 
 function draw() {
@@ -90,7 +92,7 @@ class Voice {
     this.freq = dominant_freq;
 
     this.x = 50;
-    this.y = map(this.freq, 10, 2000, 0, height);
+    this.y = map(this.freq, 10, 2000, height - 50, 50);
   }
 
   display() {
