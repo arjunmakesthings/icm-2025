@@ -1,12 +1,12 @@
 //intent: take mic-input, analyse its frequency, and loop it for a certain duration of time.
 
 let record_button;
-let recording_state = false;
-
-let mic, recorder;
+let mic, recorder, recording_file;
+let can_play = false;
 
 let voices = [];
-let currentFile;
+
+let fft; 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -15,65 +15,67 @@ function setup() {
   record_button = createButton("record");
   record_button.position(width / 2, height / 2);
 
-  record_button.mousePressed(record_stuff);
+  record_button.mousePressed(begin);
+  record_button.mouseReleased(() => {
+    setTimeout(() => {
+      end();
+    }, 500);
+  });
 
   mic = new p5.AudioIn();
   mic.start();
 
   recorder = new p5.SoundRecorder();
   recorder.setInput(mic);
+
+  recording_file = new p5.SoundFile();
+  fft = new p5.FFT();
+
+  frameRate(1);
+}
+
+function begin() {
+  record_button.html("stop");
+
+  recorder.record(recording_file);
+}
+
+function end() {
+  record_button.html("record");
+
+  recorder.stop();
+
+  recording_file.loop(); 
+
+  //perform fft analysis.
+  fft.setInput(recording_file); 
+  let frequencies = fft.analyze();
+
+  console.log(max(frequencies)); 
+
+
+  voices.push(new Voice(recording_file)); 
 }
 
 function draw() {
   background(0);
 
-  // draw all recorded voices
-  for (let voice of voices) {
+  for (let voice of voices){
     voice.display();
   }
 }
 
-function record_stuff() {
-  if (!recording_state) {
-    recording_state = true;
-    record_button.html("stop");
-
-    currentFile = new p5.SoundFile();
-    recorder.record(currentFile);
-  } else {
-    recording_state = false;
-    record_button.html("record");
-
-    recorder.stop();
-
-    setTimeout(() => {
-      let v = new Voice(currentFile);
-      v.loop(); //we set it in permanent loop here, and not in draw (otherwise it loops over itself).
-      voices.push(v);
-    }, 50);
-  }
-}
-
 class Voice {
-  constructor(soundfile) {
-    this.sound = soundfile;
+  constructor(recording_file) {
+    this.sound_file = recording_file;
 
-    this.x = random(width);
-    this.y = random(height);
-    this.color = color(random(255), random(255), random(255));
-  }
-
-  loop() {
-    this.sound.loop(); // start looping this sound
-  }
-
-  stop() {
-    this.sound.stop();
+    this.x = 50;
+    this.y=height/2; 
   }
 
   display() {
-    fill(this.color);
-    noStroke();
-    ellipse(this.x, this.y, 40, 40); // placeholder visual
+    console.log(this.sound_file); 
+    rect (this.x, this.y, this.sound_file.buffer.duration*10, 50); 
+    noLoop();
   }
 }
