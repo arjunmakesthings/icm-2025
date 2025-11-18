@@ -27,14 +27,15 @@ function setup() {
 
   recording_file = new p5.SoundFile();
   fft = new p5.FFT();
-
-  frameRate(1);
 }
 
 function begin() {
   record_button.html("stop");
 
-  recorder.record(recording_file);
+  let current_file = new p5.SoundFile();
+  recorder.record(current_file);
+
+  recording_file = current_file;
 }
 
 function end() {
@@ -42,16 +43,15 @@ function end() {
 
   recorder.stop();
 
-  //for everything else, i need to add a set timeout as a buffer to load the audio file i recorded.
   setTimeout(() => {
+    //fft needs you to play the recording first. so do that:
     recording_file.play();
 
+    //once it ends, analyse the frequency:
     recording_file.onended(() => {
-      //after the playing has ended, perform an fft analysis.
       fft.setInput(recording_file);
       let frequencies = fft.analyze();
 
-      //find frequency-bin with max amplitude.
       let maxAmp = 0;
       let maxIndex = 0;
       for (let i = 0; i < frequencies.length; i++) {
@@ -61,25 +61,19 @@ function end() {
         }
       }
 
-      //convert bin index to frequency.
-      let nyquist = sampleRate() / 2; // Nyquist frequency
+      let nyquist = sampleRate() / 2;
       let freqPerBin = nyquist / frequencies.length;
-      let dominantFreq = maxIndex * freqPerBin;
+      let dominant_freq = maxIndex * freqPerBin;
 
-      // console.log("max amplitude:", maxAmp);
-      // console.log("dominant frequency (hz):", dominantFreq);
+      console.log("dominant frequency (hz):", dominant_freq);
+
+      //now push into voices:
+      voices.push(new Voice(recording_file, dominant_freq));
+
+      //set it to play on loop:
+      recording_file.loop();
     });
-
-    recording_file.loop();
-    voices.push(new Voice(recording_file));
-  }, 50);
-}
-
-function createLooper(){
-  let looper = new p5.SoundLoop();
-
-  // let interval = fre
-
+  }, 100);
 }
 
 function draw() {
@@ -91,16 +85,15 @@ function draw() {
 }
 
 class Voice {
-  constructor(recording_file) {
+  constructor(recording_file, dominant_freq) {
     this.sound_file = recording_file;
+    this.freq = dominant_freq;
 
     this.x = 50;
-    this.y = height / 2;
+    this.y = map(this.freq, 10, 2000, 0, height);
   }
 
   display() {
-    console.log(this.sound_file);
     rect(this.x, this.y, this.sound_file.buffer.duration * 10, 50);
-    noLoop();
   }
 }
