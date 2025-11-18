@@ -16,11 +16,8 @@ function setup() {
   record_button.position(width / 2, height / 2);
 
   record_button.mousePressed(begin);
-  record_button.mouseReleased(() => {
-    setTimeout(() => {
-      end();
-    }, 500);
-  });
+
+  record_button.mouseReleased(end);
 
   mic = new p5.AudioIn();
   mic.start();
@@ -45,15 +42,18 @@ function end() {
 
   recorder.stop();
 
-  recording_file.loop();
+  //for everything else, i need to add a set timeout as a buffer to load the audio file i recorded. 
+  setTimeout(() => {
+    recording_file.loop();
 
-  //perform fft analysis.
-  fft.setInput(recording_file);
-  let frequencies = fft.analyze();
+    //perform fft analysis.
+    fft.setInput(recording_file);
+    let frequencies = fft.analyze();
 
-  console.log(max(frequencies));
+    voices.push(new Voice(recording_file));
+  }, 50); 
 
-  voices.push(new Voice(recording_file));
+
 }
 
 function draw() {
