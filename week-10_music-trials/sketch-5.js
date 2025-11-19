@@ -24,7 +24,6 @@ function setup() {
   recorder.setInput(mic);
 
   recording_file = new p5.SoundFile();
-  // fft = new p5.FFT();
 }
 
 function begin() {
@@ -80,8 +79,8 @@ function draw() {
   background(0);
 
   for (let voice of voices) {
-    voice.update();
     voice.display();
+    voice.update();
   }
 }
 
@@ -90,57 +89,65 @@ class Voice {
     this.sound_file = recording_file;
     this.freq = dominant_freq;
 
-    this.x = 50;
-    this.y = map(this.freq, 75, 1200, height - 50, 50); //mapped to human singing range: https://en.wikipedia.org/wiki/Vocal_range
+    this.x = voices.length * 20;
+    this.y = map(this.freq, 75, 1200, height - 50, 50); //mapped to human vocal range: https://en.wikipedia.org/wiki/Vocal_range
 
-    //got bpm bit from chat-gpt.
+    //got bpm stuff from chat-gpt.
     this.bpm = bpm;
-    this.interval = 60 / this.bpm; // in seconds
-    this.nextPlayTime = 0; // when the next beat should occur
+    this.interval = 60 / this.bpm; // seconds per beat
+    this.nextPlayTime = 0;
     this.isPlaying = false;
 
-    this.harmonies = floor(map(this.freq, 75, 1200, 2, 20)); //more harmonies as you go higher.
+    this.harmonies = floor(map(this.freq, 75, 1200, 2, 20));
+    this.oscs = [];
+    this.delays = [];
 
-    this.oscs = []; //array of oscillators for harmonies.
-
-    let scales = [1.0, 1.059, 1.122, 1.189, 1.26, 1.335, 1.414, 2.0];
+    let scales = [1.0, 1.059, 1.122, 1.189, 1.26, 1.335, 1.414, 2.0]; //nnenna's scale.
 
     for (let i = 0; i < this.harmonies; i++) {
-      this.oscs.push(new p5.Oscillator("sine"));
-      let n = random(scales);
-      this.oscs.freq = scales[n];
+      let osc = new p5.Oscillator("sine");
+      let n = floor(random(scales.length));
+      osc.freq(this.freq * scales[n]);
+      osc.amp(0);
+      osc.start();
+
+      this.oscs.push(osc);
+      this.delays.push(random(0, 0.2)); // small stagger
     }
   }
 
   update() {
-    let currentTime = millis() / 1000; // current time in seconds
+    let t = millis() / 1000; // current time in seconds
 
-    // If current time is past the next play time, start/stop the oscillator
-    if (currentTime >= this.nextPlayTime) {
+    if (t >= this.nextPlayTime) {
       if (!this.isPlaying) {
-        for (let i = 0; i<this.oscs.length; i++){
-          this.oscs[i].start();
+        // fade in oscillators with staggered delays
+        for (let i = 0; i < this.oscs.length; i++) {
+          let osc = this.oscs[i];
+          let d = this.delays[i];
+          setTimeout(() => {
+            osc.amp(0.6, 0.15);
+          }, d * 1000);
         }
         this.isPlaying = true;
       } else {
+        // fade out all oscillators, but in the same way they were brought in. otherwise they create static.
         for (let i = 0; i < this.oscs.length; i++) {
-          this.oscs[i].stop();
+          let osc = this.oscs[i];
+          let d = this.delays[i];
+          setTimeout(() => {
+            osc.amp(0, 0.15);
+          }, d * 1000);
         }
         this.isPlaying = false;
       }
 
-      // Set the next time to play (looping based on BPM)
-      this.nextPlayTime = currentTime + this.interval;
+      this.nextPlayTime = t + this.interval;
     }
   }
 
   display() {
-    // If playing, show the oscillator as active
-    if (this.isPlaying) {
-      fill(0, 255, 0); // Green for active
-    } else {
-      fill(255, 0, 0); // Red for inactive
-    }
-    rect(this.x, this.y, this.sound_file.buffer.duration * 10, 50);
+    fill(this.isPlaying ? color(0, 255, 0) : color(255, 0, 0));
+    rect(this.x, this.y, 50, 30);
   }
 }
