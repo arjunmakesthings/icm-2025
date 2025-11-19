@@ -6,10 +6,14 @@ let can_play = false;
 
 let voices = [];
 
-let global_reverb; 
-let rev = 5; 
+let global_reverb;
+let rev = 5;
 
-let global_delay; 
+let global_delay;
+
+let global_play = true;
+
+let record = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -30,13 +34,12 @@ function setup() {
 
   recording_file = new p5.SoundFile();
 
-  global_reverb = new p5.Reverb(); 
-  global_delay = new p5.Delay(); 
-
-
+  global_reverb = new p5.Reverb();
+  global_delay = new p5.Delay();
 }
 
 function begin() {
+  global_play = false;
   record_button.html("stop");
 
   let current_file = new p5.SoundFile();
@@ -46,6 +49,7 @@ function begin() {
 }
 
 function end() {
+  global_play = false;
   record_button.html("record");
 
   recorder.stop();
@@ -74,7 +78,7 @@ function end() {
       let freqPerBin = nyquist / frequencies.length;
       let dominant_freq = maxIndex * freqPerBin;
 
-      console.log(frequencies); 
+      console.log(frequencies);
 
       console.log("dominant frequency (hz):", dominant_freq);
 
@@ -83,16 +87,19 @@ function end() {
 
       //set it to play on loop:
       // recording_file.loop();
+      global_play = true;
     });
-  }, 100); // small buffer to ensure recording buffer is ready
+  }, 50); // small buffer to ensure recording buffer is ready
 }
 
 function draw() {
   background(0);
 
-  for (let voice of voices) {
-    voice.display();
-    voice.update();
+  if (global_play) {
+    for (let voice of voices) {
+      voice.display();
+      voice.update();
+    }
   }
 }
 
@@ -114,7 +121,9 @@ class Voice {
     this.oscs = [];
     this.delays = [];
 
-    let scales = [1.0, 1.059, 1.122, 1.189, 1.26, 1.335, 1.414, 2.0]; //nnenna's scale.
+    // let scales = [1.0, 1.059, 1.122, 1.189, 1.26, 1.335, 1.414, 2.0]; //nnenna's scale.
+
+    let scales = [1.0, 1.125, 1.25, 1.37, 1.5, 1.67, 1.875, 2.0];
 
     for (let i = 0; i < this.harmonies; i++) {
       let osc = new p5.Oscillator("sine");
@@ -140,7 +149,7 @@ class Voice {
           setTimeout(() => {
             osc.amp(0.6, 0.25);
           }, i * d * 1000);
-          global_reverb.process(osc, rev + i);
+          // global_reverb.process(osc, rev + i);
           // global_delay.process(osc, 1);
         }
         this.isPlaying = true;
