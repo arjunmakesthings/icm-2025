@@ -6,6 +6,11 @@ let can_play = false;
 
 let voices = [];
 
+let global_reverb; 
+let rev = 5; 
+
+let global_delay; 
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   userStartAudio();
@@ -24,6 +29,11 @@ function setup() {
   recorder.setInput(mic);
 
   recording_file = new p5.SoundFile();
+
+  global_reverb = new p5.Reverb(); 
+  global_delay = new p5.Delay(); 
+
+
 }
 
 function begin() {
@@ -63,6 +73,8 @@ function end() {
       let nyquist = sampleRate() / 2;
       let freqPerBin = nyquist / frequencies.length;
       let dominant_freq = maxIndex * freqPerBin;
+
+      console.log(frequencies); 
 
       console.log("dominant frequency (hz):", dominant_freq);
 
@@ -126,8 +138,10 @@ class Voice {
           let osc = this.oscs[i];
           let d = this.delays[i];
           setTimeout(() => {
-            osc.amp(0.6, 0.15);
-          }, d * 1000);
+            osc.amp(0.6, 0.25);
+          }, i * d * 1000);
+          global_reverb.process(osc, rev + i);
+          // global_delay.process(osc, 1);
         }
         this.isPlaying = true;
       } else {
@@ -136,8 +150,8 @@ class Voice {
           let osc = this.oscs[i];
           let d = this.delays[i];
           setTimeout(() => {
-            osc.amp(0, 0.15);
-          }, d * 1000);
+            osc.amp(0, 0.25);
+          }, i * d * 1000);
         }
         this.isPlaying = false;
       }
