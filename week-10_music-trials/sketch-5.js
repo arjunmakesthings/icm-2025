@@ -6,8 +6,6 @@ let can_play = false;
 
 let voices = [];
 
-// let fft;
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   userStartAudio();
@@ -73,7 +71,7 @@ function end() {
       voices.push(new Voice(recording_file, dominant_freq));
 
       //set it to play on loop:
-      recording_file.loop();
+      // recording_file.loop();
     });
   }, 100); // small buffer to ensure recording buffer is ready
 }
@@ -93,9 +91,15 @@ class Voice {
 
     this.x = 50;
     this.y = map(this.freq, 10, 2000, height - 50, 50);
+
+    //nnenna wants to create oscillators: 
+    this.osc = new p5.Oscillator ('sine'); 
+    this.osc.amp (1); 
+    this.osc.freq (this.freq); 
   }
 
   display() {
     rect(this.x, this.y, this.sound_file.buffer.duration * 10, 50);
+    this.osc.start(); 
   }
 }
