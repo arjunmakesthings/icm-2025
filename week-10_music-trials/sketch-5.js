@@ -19,6 +19,8 @@ let convert_to_osc = true;
 
 let t_to_display = "not now";
 
+let timer = 0; 
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   userStartAudio();
@@ -105,6 +107,8 @@ function end() {
 function draw() {
   background(0);
 
+  timer = floor(millis()/1000); 
+
   if (global_play) {
     for (let voice of voices) {
       voice.display();
@@ -120,6 +124,7 @@ function draw() {
   fill(190);
   text("convert_to_osc: " + convert_to_osc, width / 2 - 5, height / 2 + 50);
   text(t_to_display, width / 2 - 5, height / 2 + 100);
+  text("time: " + timer, width / 2 - 5, height / 2 + 150);
 }
 
 class Voice {
