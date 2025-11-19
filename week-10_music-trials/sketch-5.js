@@ -17,6 +17,8 @@ let record = false;
 
 let convert_to_osc = true;
 
+let t_to_display = "not now"; 
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   userStartAudio();
@@ -39,7 +41,7 @@ function setup() {
   global_reverb = new p5.Reverb();
   global_delay = new p5.Delay();
 
-  textAlign(CENTER); 
+  textAlign(LEFT); 
 }
 
 function begin() {
@@ -109,7 +111,9 @@ function draw() {
   }
 
   fill (255); 
-  text ("convert_to_osc: " + convert_to_osc , 100, 50); 
+  text ("convert_to_osc: " + convert_to_osc , width/2-5, height/2 + 50); 
+
+  text (t_to_display, width/2-5, height/2+100); 
 }
 
 class Voice {
@@ -162,11 +166,13 @@ class Voice {
           let osc = this.oscs[i];
           let d = this.delays[i];
           setTimeout(() => {
-            osc.amp(0.6, 0.25);
+            osc.amp(i/1, 0.25);
           }, i * d * 1000);
           // global_delay.process(osc, 1);
         }
         this.isPlaying = true;
+
+        t_to_display = "now"; 
       } else {
         // fade out all oscillators, but in the same way they were brought in. otherwise they create static.
         for (let i = 0; i < this.oscs.length; i++) {
@@ -177,6 +183,7 @@ class Voice {
           }, i * d * 1000);
         }
         this.isPlaying = false;
+        t_to_display = "not now"; 
       }
 
       this.nextPlayTime = t + this.interval;
