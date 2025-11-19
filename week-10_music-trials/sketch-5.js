@@ -111,9 +111,15 @@ function draw() {
   }
 
   fill (255); 
-  text ("convert_to_osc: " + convert_to_osc , width/2-5, height/2 + 50); 
+  textSize(16); 
+  text("hums & drums, by nnenna & arjun", 50, 50); 
 
+  textSize(12); 
+  fill (190); 
+  text ("convert_to_osc: " + convert_to_osc , width/2-5, height/2 + 50); 
   text (t_to_display, width/2-5, height/2+100); 
+
+
 }
 
 class Voice {
