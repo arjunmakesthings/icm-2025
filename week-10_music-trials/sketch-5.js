@@ -42,6 +42,8 @@ function setup() {
   global_delay = new p5.Delay();
 
   textAlign(LEFT);
+
+  noiseSeed(99); 
 }
 
 function begin() {
