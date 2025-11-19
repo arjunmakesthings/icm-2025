@@ -68,7 +68,7 @@ function end() {
       console.log("dominant frequency (hz):", dominant_freq);
 
       //now push into voices:
-      voices.push(new Voice(recording_file, dominant_freq));
+      voices.push(new Voice(recording_file, dominant_freq, 60));
 
       //set it to play on loop:
       // recording_file.loop();
@@ -80,26 +80,67 @@ function draw() {
   background(0);
 
   for (let voice of voices) {
+    voice.update();
     voice.display();
   }
 }
 
 class Voice {
-  constructor(recording_file, dominant_freq) {
+  constructor(recording_file, dominant_freq, bpm) {
     this.sound_file = recording_file;
     this.freq = dominant_freq;
 
     this.x = 50;
-    this.y = map(this.freq, 10, 2000, height - 50, 50);
+    this.y = map(this.freq, 75, 1200, height - 50, 50); //mapped to human singing range: https://en.wikipedia.org/wiki/Vocal_range
 
-    //nnenna wants to create oscillators: 
-    this.osc = new p5.Oscillator ('sine'); 
-    this.osc.amp (1); 
-    this.osc.freq (this.freq); 
+    //got bpm bit from chat-gpt.
+    this.bpm = bpm;
+    this.interval = 60 / this.bpm; // in seconds
+    this.nextPlayTime = 0; // when the next beat should occur
+    this.isPlaying = false;
+
+    this.harmonies = floor(map(this.freq, 75, 1200, 2, 20)); //more harmonies as you go higher.
+
+    this.oscs = []; //array of oscillators for harmonies.
+
+    let scales = [1.0, 1.059, 1.122, 1.189, 1.26, 1.335, 1.414, 2.0];
+
+    for (let i = 0; i < this.harmonies; i++) {
+      this.oscs.push(new p5.Oscillator("sine"));
+      let n = random(scales);
+      this.oscs.freq = scales[n];
+    }
+  }
+
+  update() {
+    let currentTime = millis() / 1000; // current time in seconds
+
+    // If current time is past the next play time, start/stop the oscillator
+    if (currentTime >= this.nextPlayTime) {
+      if (!this.isPlaying) {
+        for (let i = 0; i<this.oscs.length; i++){
+          this.oscs[i].start();
+        }
+        this.isPlaying = true;
+      } else {
+        for (let i = 0; i < this.oscs.length; i++) {
+          this.oscs[i].stop();
+        }
+        this.isPlaying = false;
+      }
+
+      // Set the next time to play (looping based on BPM)
+      this.nextPlayTime = currentTime + this.interval;
+    }
   }
 
   display() {
+    // If playing, show the oscillator as active
+    if (this.isPlaying) {
+      fill(0, 255, 0); // Green for active
+    } else {
+      fill(255, 0, 0); // Red for inactive
+    }
     rect(this.x, this.y, this.sound_file.buffer.duration * 10, 50);
-    this.osc.start(); 
   }
 }
