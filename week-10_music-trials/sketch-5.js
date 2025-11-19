@@ -38,6 +38,8 @@ function setup() {
 
   global_reverb = new p5.Reverb();
   global_delay = new p5.Delay();
+
+  textAlign(CENTER); 
 }
 
 function begin() {
@@ -107,7 +109,7 @@ function draw() {
   }
 
   fill (255); 
-  text ("convert_to_osc: " + convert_to_osc , width/2, height/2+100); 
+  text ("convert_to_osc: " + convert_to_osc , 100, 50); 
 }
 
 class Voice {
@@ -130,7 +132,9 @@ class Voice {
 
     // let scales = [1.0, 1.059, 1.122, 1.189, 1.26, 1.335, 1.414, 2.0]; //nnenna's scale.
 
-    let scales = [1.0, 1.125, 1.25, 1.37, 1.5, 1.67, 1.875, 2.0];
+    // let scales = [1.0, 1.125, 1.25, 1.37, 1.5, 1.67, 1.875, 2.0];
+
+    let scales = [1.0, 1.125, 1.25, 1.5, 1.67, 2.0]; 
 
     this.convert = convert;
 
