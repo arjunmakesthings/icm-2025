@@ -43,7 +43,7 @@ function setup() {
 
   textAlign(LEFT);
 
-  noiseSeed(99); 
+  noiseSeed(99); //add noise seed.
 }
 
 function begin() {
