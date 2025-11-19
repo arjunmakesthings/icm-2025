@@ -189,6 +189,7 @@ class Voice {
           t_to_display = "not now";
         }
 
+        this.interval = noise(frameCount) + 60 / this.bpm; //add a slight difference to create pattern & anti-pattern.
         this.nextPlayTime = t + this.interval;
       }
     }
