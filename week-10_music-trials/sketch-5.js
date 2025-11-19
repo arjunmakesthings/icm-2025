@@ -15,6 +15,8 @@ let global_play = true;
 
 let record = false;
 
+let convert_to_osc = true;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   userStartAudio();
@@ -78,15 +80,17 @@ function end() {
       let freqPerBin = nyquist / frequencies.length;
       let dominant_freq = maxIndex * freqPerBin;
 
-      console.log(frequencies);
-
       console.log("dominant frequency (hz):", dominant_freq);
 
+      let temp_convert_to_osc = convert_to_osc; 
+
       //now push into voices:
-      voices.push(new Voice(recording_file, dominant_freq, 60));
+      voices.push(new Voice(recording_file, dominant_freq, 60, temp_convert_to_osc));
 
       //set it to play on loop:
-      // recording_file.loop();
+      if (convert_to_osc == false){
+      recording_file.loop();
+    }
       global_play = true;
     });
   }, 50); // small buffer to ensure recording buffer is ready
@@ -101,10 +105,13 @@ function draw() {
       voice.update();
     }
   }
+
+  fill (255); 
+  text ("convert_to_osc: " + convert_to_osc , width/2, height/2+100); 
 }
 
 class Voice {
-  constructor(recording_file, dominant_freq, bpm) {
+  constructor(recording_file, dominant_freq, bpm, convert) {
     this.sound_file = recording_file;
     this.freq = dominant_freq;
 
@@ -125,6 +132,8 @@ class Voice {
 
     let scales = [1.0, 1.125, 1.25, 1.37, 1.5, 1.67, 1.875, 2.0];
 
+    this.convert = convert;
+
     for (let i = 0; i < this.harmonies; i++) {
       let osc = new p5.Oscillator("sine");
       let n = floor(random(scales.length));
@@ -140,6 +149,8 @@ class Voice {
   update() {
     let t = millis() / 1000; // current time in seconds
 
+    if (this.convert==true){
+
     if (t >= this.nextPlayTime) {
       if (!this.isPlaying) {
         // fade in oscillators with staggered delays
@@ -149,7 +160,6 @@ class Voice {
           setTimeout(() => {
             osc.amp(0.6, 0.25);
           }, i * d * 1000);
-          // global_reverb.process(osc, rev + i);
           // global_delay.process(osc, 1);
         }
         this.isPlaying = true;
@@ -168,9 +178,14 @@ class Voice {
       this.nextPlayTime = t + this.interval;
     }
   }
+}
 
   display() {
     fill(this.isPlaying ? color(0, 255, 0) : color(255, 0, 0));
     rect(this.x, this.y, 50, 30);
   }
+}
+
+function keyPressed(){
+convert_to_osc = !convert_to_osc;
 }
