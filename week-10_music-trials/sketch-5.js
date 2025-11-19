@@ -17,7 +17,7 @@ let record = false;
 
 let convert_to_osc = true;
 
-let t_to_display = "not now"; 
+let t_to_display = "not now";
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -41,7 +41,7 @@ function setup() {
   global_reverb = new p5.Reverb();
   global_delay = new p5.Delay();
 
-  textAlign(LEFT); 
+  textAlign(LEFT);
 }
 
 function begin() {
@@ -86,15 +86,15 @@ function end() {
 
       console.log("dominant frequency (hz):", dominant_freq);
 
-      let temp_convert_to_osc = convert_to_osc; 
+      let temp_convert_to_osc = convert_to_osc;
 
       //now push into voices:
       voices.push(new Voice(recording_file, dominant_freq, 60, temp_convert_to_osc));
 
       //set it to play on loop:
-      if (convert_to_osc == false){
-      recording_file.loop();
-    }
+      if (convert_to_osc == false) {
+        recording_file.loop();
+      }
       global_play = true;
     });
   }, 50); // small buffer to ensure recording buffer is ready
@@ -110,16 +110,14 @@ function draw() {
     }
   }
 
-  fill (255); 
-  textSize(16); 
-  text("hums & drums, by nnenna & arjun", 50, 50); 
+  fill(255);
+  textSize(16);
+  text("hums & drums, by nnenna & arjun", 50, 50);
 
-  textSize(12); 
-  fill (190); 
-  text ("convert_to_osc: " + convert_to_osc , width/2-5, height/2 + 50); 
-  text (t_to_display, width/2-5, height/2+100); 
-
-
+  textSize(12);
+  fill(190);
+  text("convert_to_osc: " + convert_to_osc, width / 2 - 5, height / 2 + 50);
+  text(t_to_display, width / 2 - 5, height / 2 + 100);
 }
 
 class Voice {
@@ -144,7 +142,7 @@ class Voice {
 
     // let scales = [1.0, 1.125, 1.25, 1.37, 1.5, 1.67, 1.875, 2.0];
 
-    let scales = [1.0, 1.125, 1.25, 1.5, 1.67, 2.0]; 
+    let scales = [1.0, 1.125, 1.25, 1.5, 1.67, 2.0];
 
     this.convert = convert;
 
@@ -163,39 +161,38 @@ class Voice {
   update() {
     let t = millis() / 1000; // current time in seconds
 
-    if (this.convert==true){
+    if (this.convert == true) {
+      if (t >= this.nextPlayTime) {
+        if (!this.isPlaying) {
+          // fade in oscillators with staggered delays
+          for (let i = 0; i < this.oscs.length; i++) {
+            let osc = this.oscs[i];
+            let d = this.delays[i];
+            setTimeout(() => {
+              osc.amp(i / 1, 0.25);
+            }, i * d * 1000);
+            // global_delay.process(osc, 1);
+          }
+          this.isPlaying = true;
 
-    if (t >= this.nextPlayTime) {
-      if (!this.isPlaying) {
-        // fade in oscillators with staggered delays
-        for (let i = 0; i < this.oscs.length; i++) {
-          let osc = this.oscs[i];
-          let d = this.delays[i];
-          setTimeout(() => {
-            osc.amp(i/1, 0.25);
-          }, i * d * 1000);
-          // global_delay.process(osc, 1);
+          t_to_display = "now";
+        } else {
+          // fade out all oscillators, but in the same way they were brought in. otherwise they create static.
+          for (let i = 0; i < this.oscs.length; i++) {
+            let osc = this.oscs[i];
+            let d = this.delays[i];
+            setTimeout(() => {
+              osc.amp(0, 0.25);
+            }, i * d * 1000);
+          }
+          this.isPlaying = false;
+          t_to_display = "not now";
         }
-        this.isPlaying = true;
 
-        t_to_display = "now"; 
-      } else {
-        // fade out all oscillators, but in the same way they were brought in. otherwise they create static.
-        for (let i = 0; i < this.oscs.length; i++) {
-          let osc = this.oscs[i];
-          let d = this.delays[i];
-          setTimeout(() => {
-            osc.amp(0, 0.25);
-          }, i * d * 1000);
-        }
-        this.isPlaying = false;
-        t_to_display = "not now"; 
+        this.nextPlayTime = t + this.interval;
       }
-
-      this.nextPlayTime = t + this.interval;
     }
   }
-}
 
   display() {
     fill(this.isPlaying ? color(0, 255, 0) : color(255, 0, 0));
@@ -203,6 +200,6 @@ class Voice {
   }
 }
 
-function keyPressed(){
-convert_to_osc = !convert_to_osc;
+function keyPressed() {
+  convert_to_osc = !convert_to_osc;
 }
