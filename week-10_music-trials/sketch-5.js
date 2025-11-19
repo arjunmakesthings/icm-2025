@@ -6,8 +6,6 @@ let can_play = false;
 
 let voices = [];
 
-// let fft;
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   userStartAudio();
@@ -26,7 +24,6 @@ function setup() {
   recorder.setInput(mic);
 
   recording_file = new p5.SoundFile();
-  // fft = new p5.FFT();
 }
 
 function begin() {
@@ -70,10 +67,10 @@ function end() {
       console.log("dominant frequency (hz):", dominant_freq);
 
       //now push into voices:
-      voices.push(new Voice(recording_file, dominant_freq));
+      voices.push(new Voice(recording_file, dominant_freq, 60));
 
       //set it to play on loop:
-      recording_file.loop();
+      // recording_file.loop();
     });
   }, 100); // small buffer to ensure recording buffer is ready
 }
@@ -83,19 +80,74 @@ function draw() {
 
   for (let voice of voices) {
     voice.display();
+    voice.update();
   }
 }
 
 class Voice {
-  constructor(recording_file, dominant_freq) {
+  constructor(recording_file, dominant_freq, bpm) {
     this.sound_file = recording_file;
     this.freq = dominant_freq;
 
-    this.x = 50;
-    this.y = map(this.freq, 10, 2000, height - 50, 50);
+    this.x = voices.length * 20;
+    this.y = map(this.freq, 75, 1200, height - 50, 50); //mapped to human vocal range: https://en.wikipedia.org/wiki/Vocal_range
+
+    //got bpm stuff from chat-gpt.
+    this.bpm = bpm;
+    this.interval = 60 / this.bpm; // seconds per beat
+    this.nextPlayTime = 0;
+    this.isPlaying = false;
+
+    this.harmonies = floor(map(this.freq, 75, 1200, 2, 20));
+    this.oscs = [];
+    this.delays = [];
+
+    let scales = [1.0, 1.059, 1.122, 1.189, 1.26, 1.335, 1.414, 2.0]; //nnenna's scale.
+
+    for (let i = 0; i < this.harmonies; i++) {
+      let osc = new p5.Oscillator("sine");
+      let n = floor(random(scales.length));
+      osc.freq(this.freq * scales[n]);
+      osc.amp(0);
+      osc.start();
+
+      this.oscs.push(osc);
+      this.delays.push(random(0, 0.2)); // small stagger
+    }
+  }
+
+  update() {
+    let t = millis() / 1000; // current time in seconds
+
+    if (t >= this.nextPlayTime) {
+      if (!this.isPlaying) {
+        // fade in oscillators with staggered delays
+        for (let i = 0; i < this.oscs.length; i++) {
+          let osc = this.oscs[i];
+          let d = this.delays[i];
+          setTimeout(() => {
+            osc.amp(0.6, 0.15);
+          }, d * 1000);
+        }
+        this.isPlaying = true;
+      } else {
+        // fade out all oscillators, but in the same way they were brought in. otherwise they create static.
+        for (let i = 0; i < this.oscs.length; i++) {
+          let osc = this.oscs[i];
+          let d = this.delays[i];
+          setTimeout(() => {
+            osc.amp(0, 0.15);
+          }, d * 1000);
+        }
+        this.isPlaying = false;
+      }
+
+      this.nextPlayTime = t + this.interval;
+    }
   }
 
   display() {
-    rect(this.x, this.y, this.sound_file.buffer.duration * 10, 50);
+    fill(this.isPlaying ? color(0, 255, 0) : color(255, 0, 0));
+    rect(this.x, this.y, 50, 30);
   }
 }
